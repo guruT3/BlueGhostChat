@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueGhost Chat 👻</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Navbar -->
+        <nav class="navbar navbar-custom d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('index') }}" class="text-decoration-none text-white d-flex align-items-center gap-2 fs-5 fw-bold">
+                    <span class="fs-4">👻</span> BlueGhost
+                </a>
+                <span class="badge bg-dark border border-secondary text-info px-3 py-2 rounded-pill">
+                    <i class="fa-solid fa-ghost me-1"></i> You: <strong id="myGhostName">{{ identity }}</strong>
+                </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('qr_page') }}" target="_blank" class="btn btn-neon-cyan btn-sm py-1 px-3 text-decoration-none">
+                    <i class="fa-solid fa-qrcode me-1"></i> Show QR Code
+                </a>
+                <button id="scanBtn" class="btn btn-ghost-outline btn-sm">
+                    <i class="fa-solid fa-radar me-1" id="scanIcon"></i> Scan BLE Devices
+                </button>
+                <button id="soundToggleBtn" class="btn btn-ghost-outline btn-sm">
+                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Disconnection / Out of Range Banner (Hidden by default) -->
+        <div id="reconnectBanner" class="banner-alert d-none">
+            <span><i class="fa-solid fa-triangle-exclamation me-2"></i> <strong id="reconnectMsg">Ghost moved out of range. Attempting reconnection automatically...</strong></span>
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+        </div>
+
+        <!-- Main Body -->
+        <div class="main-content">
+            <!-- Sidebar / Scanner Panel -->
+            <div class="sidebar-devices">
+                <div class="p-3 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-uppercase text-muted small tracking-wide">
+                        <i class="fa-brands fa-bluetooth-b text-info me-1"></i> Nearby Ghosts
+                    </h6>
+                    <span class="badge bg-secondary text-dark" id="deviceCount">0 Found</span>
+                </div>
+
+                <div class="p-3 flex-grow-1 overflow-y-auto" id="devicesList">
+                    <!-- Dynamic scanned device items rendered by JS -->
+                    <div class="text-center text-muted my-5">
+                        <div class="spinner-border spinner-border-sm text-info mb-2"></div>
+                        <p class="small">Scanning Bluetooth spectrum...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Panel -->
+            <div class="chat-panel">
+                <!-- Selected Device Header -->
+                <div id="chatHeader" class="p-3 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center bg-dark bg-opacity-50">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="device-avatar" id="activeAvatar">👻</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold" id="activeGhostName">Select a nearby Ghost to chat</h6>
+                            <small class="text-muted" id="activeDeviceMeta">Offline • Bluetooth Channel</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success d-none" id="connectedBadge">
+                            <i class="fa-solid fa-link me-1"></i> Connected
+                        </span>
+                        <button id="disconnectBtn" class="btn btn-danger btn-sm d-none">
+                            <i class="fa-solid fa-plug-circle-xmark me-1"></i> Disconnect
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages History Container -->
+                <div class="chat-messages" id="chatMessages">
+                    <div class="text-center text-muted my-auto" id="emptyChatPlaceholder">
+                        <i class="fa-solid fa-comments fa-3x mb-3 text-secondary opacity-50"></i>
+                        <h5>No active haunt session</h5>
+                        <p class="small">Connect to a nearby Bluetooth Ghost to exchange encrypted messages.</p>
+                    </div>
+                </div>
+
+                <!-- Typing Haunting Animation -->
+                <div class="typing-indicator d-none" id="typingIndicator">
+                    <span class="pulse-dot"></span>
+                    <span class="pulse-dot"></span>
+                    <span class="pulse-dot"></span>
+                    <span id="typingText" class="ms-2">Ghost is haunting...</span>
+                </div>
+
+                <!-- Attachment Preview Container -->
+                <div id="filePreviewBar" class="p-2 bg-dark border-top border-secondary border-opacity-25 d-none">
+                    <div class="d-flex align-items-center justify-content-between bg-secondary bg-opacity-25 p-2 rounded">
+                        <div class="d-flex align-items-center gap-2 overflow-hidden">
+                            <i class="fa-solid fa-paperclip text-info" id="previewIcon"></i>
+                            <span class="small text-truncate" id="previewFileName">filename.png</span>
+                            <span class="badge bg-dark text-muted small" id="previewFileSize">0 KB</span>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" id="cancelPreviewBtn"></button>
+                    </div>
+                </div>
+
+                <!-- Chat Toolbar & Input -->
+                <div class="chat-input-bar">
+                    <form id="messageForm" class="d-flex align-items-center gap-2">
+                        <!-- Self Destruct Timer Selector -->
+                        <div class="dropdown">
+                            <button class="btn btn-ghost-outline btn-sm dropdown-toggle" type="button" id="timerDropdown" data-bs-toggle="dropdown">
+                                <i class="fa-solid fa-clock text-warning me-1"></i> <span id="selectedTimerLabel">Off</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item active" href="#" data-seconds="0">Off (Permanent)</a></li>
+                                <li><a class="dropdown-item" href="#" data-seconds="10">10 Seconds</a></li>
+                                <li><a class="dropdown-item" href="#" data-seconds="30">30 Seconds</a></li>
+                                <li><a class="dropdown-item" href="#" data-seconds="60">1 Minute</a></li>
+                                <li><a class="dropdown-item" href="#" data-seconds="300">5 Minutes</a></li>
+                                <li><a class="dropdown-item" href="#" data-seconds="86400">24 Hours</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Image Attachment Button -->
+                        <input type="file" id="imageInput" accept="image/jpeg,image/png,image/gif" class="d-none">
+                        <button type="button" class="btn btn-ghost-outline btn-sm" id="btnAttachImage" title="Send Image">
+                            <i class="fa-solid fa-image text-info"></i>
+                        </button>
+
+                        <!-- File Attachment Button -->
+                        <input type="file" id="fileInput" accept=".pdf,.zip,.txt,.docx" class="d-none">
+                        <button type="button" class="btn btn-ghost-outline btn-sm" id="btnAttachFile" title="Send File">
+                            <i class="fa-solid fa-file-lines text-purple"></i>
+                        </button>
+
+                        <!-- Emoji Picker Button -->
+                        <button type="button" class="btn btn-ghost-outline btn-sm" id="emojiToggleBtn" title="Emojis">
+                            <i class="fa-solid fa-face-smile text-warning"></i>
+                        </button>
+
+                        <!-- Text Input -->
+                        <input type="text" id="messageInput" class="form-control form-control-cyber flex-grow-1" placeholder="Type an encrypted message..." autocomplete="off">
+
+                        <!-- Send Button -->
+                        <button type="submit" class="btn btn-neon-purple" id="sendBtn">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emoji Picker Popup -->
+    <div id="emojiPicker" class="emoji-picker-container d-none">
+        <!-- Rendered dynamically by emoji.js -->
+    </div>
+
+    <!-- Image Modal View -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark border border-secondary">
+                <div class="modal-body p-1 text-center">
+                    <img src="" id="modalImg" class="img-fluid rounded" alt="Enlarged view">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Share Modal -->
+    <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border border-cyan text-center p-3" style="border: 1px solid rgba(0, 243, 255, 0.4) !important;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-white w-100" id="qrModalLabel">
+                        <i class="fa-brands fa-bluetooth-b text-cyan me-2"></i> Bluetooth Spectrum Connect
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary small mb-3">
+                        Scan this QR code with any phone camera to pair over the Bluetooth channel!
+                    </p>
+                    
+                    <div class="d-flex justify-content-center my-3">
+                        <div id="qrcodeContainer" class="p-3 bg-white rounded shadow-sm">
+                            <img id="qrCodeImg" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={{ phone_url }}" alt="QR Code" style="width: 200px; height: 200px;" />
+                        </div>
+                    </div>
+
+                    <div class="bg-secondary bg-opacity-25 p-2 rounded mb-3 text-start">
+                        <div class="text-muted extra-small uppercase tracking-wider mb-1" style="font-size: 0.65rem;">Bluetooth Node Link</div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-cyan font-monospace fw-bold me-2 text-truncate" id="phoneUrlDisplay">{{ phone_url }}</span>
+                            <button class="btn btn-outline-info btn-sm py-1 px-3" id="copyUrlBtn">
+                                <i class="fa-solid fa-copy me-1"></i> <span id="copyBtnText">Copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-dark border border-secondary text-secondary p-2 mb-0 rounded text-start" style="font-size: 0.75rem;">
+                        <i class="fa-brands fa-bluetooth-b text-info me-1"></i>
+                        <strong>Bluetooth Proximity:</strong> Turn ON Bluetooth on nearby phones to scan, pair, and chat instantly.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO Client Library -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JS Application Modules -->
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/emoji.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bluetooth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
