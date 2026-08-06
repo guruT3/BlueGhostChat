@@ -1,0 +1,441 @@
+/* BlueGhost Cyberpunk Dark Theme CSS */
+:root {
+    --bg-dark: #0b0b0b;
+    --card-dark: #171717;
+    --card-border: rgba(124, 58, 237, 0.2);
+    --accent-purple: #7c3aed;
+    --accent-purple-glow: rgba(124, 58, 237, 0.5);
+    --glow-cyan: #22d3ee;
+    --glow-cyan-shadow: rgba(34, 211, 238, 0.4);
+    --text-main: #ffffff;
+    --text-muted: #9ca3af;
+    --bubble-sent: #2d1854;
+    --bubble-received: #1f2937;
+    --glass-bg: rgba(23, 23, 23, 0.75);
+    --glass-blur: blur(16px);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
+    background-attachment: fixed;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0b0b;
+}
+::-webkit-scrollbar-thumb {
+    background: #262626;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-purple);
+}
+
+/* Glassmorphism Card */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    border-color: rgba(34, 211, 238, 0.4);
+    box-shadow: 0 8px 32px 0 var(--accent-purple-glow);
+}
+
+/* Cyber Neon Buttons */
+.btn-neon-purple {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    box-shadow: 0 0 15px var(--accent-purple-glow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.btn-neon-purple:hover {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.8), 0 0 10px var(--glow-cyan);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-neon-cyan {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: #0b0b0b;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    box-shadow: 0 0 15px var(--glow-cyan-shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.btn-neon-cyan:hover {
+    background: linear-gradient(135deg, #22d3ee, #06b6d4);
+    box-shadow: 0 0 25px var(--glow-cyan-shadow);
+    color: #0b0b0b;
+    transform: translateY(-2px);
+}
+
+.btn-ghost-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-main);
+    border-radius: 10px;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+.btn-ghost-outline:hover {
+    border-color: var(--glow-cyan);
+    color: var(--glow-cyan);
+    background: rgba(34, 211, 238, 0.05);
+}
+
+/* Landing Hero Section */
+.hero-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 2rem;
+}
+
+.ghost-logo {
+    font-size: 5rem;
+    animation: floatGhost 4s ease-in-out infinite;
+    display: inline-block;
+    filter: drop-shadow(0 0 20px var(--glow-cyan));
+}
+
+@keyframes floatGhost {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(-4deg); }
+}
+
+.glow-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 50%, var(--glow-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.identity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(124, 58, 237, 0.15);
+    border: 1px solid var(--accent-purple);
+    padding: 8px 18px;
+    border-radius: 30px;
+    color: var(--glow-cyan);
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+}
+
+/* Nearby Devices Layout */
+.app-layout {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-custom {
+    background: var(--card-dark);
+    border-bottom: 1px solid var(--card-border);
+    padding: 12px 24px;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.sidebar-devices {
+    width: 380px;
+    background: var(--card-dark);
+    border-right: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: rgba(11, 11, 11, 0.85);
+}
+
+/* Device Item Card */
+.device-card {
+    background: rgba(23, 23, 23, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.device-card:hover {
+    border-color: var(--glow-cyan);
+    background: rgba(34, 211, 238, 0.03);
+}
+.device-card.active {
+    border-color: var(--accent-purple);
+    background: rgba(124, 58, 237, 0.1);
+    box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
+}
+
+.device-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1f2937, #374151);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.signal-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: #374151;
+    overflow: hidden;
+    margin-top: 6px;
+}
+.signal-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-purple), var(--glow-cyan));
+    transition: width 0.3s ease;
+}
+
+/* Chat Messages */
+.chat-messages {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.msg-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 68%;
+    animation: fadeInMsg 0.3s ease;
+}
+
+@keyframes fadeInMsg {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-wrapper.sent {
+    align-self: flex-end;
+}
+.msg-wrapper.received {
+    align-self: flex-start;
+}
+
+.msg-bubble {
+    padding: 12px 18px;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    position: relative;
+    word-break: break-word;
+}
+
+.msg-wrapper.sent .msg-bubble {
+    background: linear-gradient(135deg, #5b21b6, #7c3aed);
+    color: white;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+.msg-wrapper.received .msg-bubble {
+    background: #1f2937;
+    color: #f3f4f6;
+    border-bottom-left-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.msg-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.msg-wrapper.sent .msg-meta {
+    align-self: flex-end;
+}
+
+.self-destruct-tag {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Images & Files */
+.msg-image {
+    max-width: 280px;
+    max-height: 220px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-top: 6px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.msg-file-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-top: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Typing Haunting Indicator */
+.typing-indicator {
+    padding: 8px 24px;
+    color: var(--glow-cyan);
+    font-size: 0.85rem;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--glow-cyan);
+    animation: pulseGlow 1.4s infinite ease-in-out;
+}
+.pulse-dot:nth-child(2) { animation-delay: 0.2s; }
+.pulse-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulseGlow {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Chat Input Toolbar */
+.chat-input-bar {
+    background: var(--card-dark);
+    border-top: 1px solid var(--card-border);
+    padding: 14px 20px;
+}
+
+.form-control-cyber {
+    background: #0b0b0b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    border-radius: 12px;
+    padding: 10px 16px;
+}
+.form-control-cyber:focus {
+    background: #0b0b0b;
+    border-color: var(--glow-cyan);
+    box-shadow: 0 0 10px var(--glow-cyan-shadow);
+    color: white;
+}
+
+/* Emoji Picker Popup */
+.emoji-picker-container {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    width: 320px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--card-dark);
+    border: 1px solid var(--accent-purple);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    z-index: 100;
+}
+.emoji-btn {
+    font-size: 1.4rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.emoji-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Disconnected Alert Banner */
+.banner-alert {
+    background: linear-gradient(90deg, #991b1b, #7f1d1d);
+    color: white;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideDown 0.3s ease;
+}
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
